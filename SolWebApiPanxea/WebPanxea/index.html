@@ -87,7 +87,7 @@
     </div>
 
     <script>
-        // Cambia el puerto (por ejemplo 5000 o 7200) por el que use tu API de .NET
+
         const URL_API = "https://localhost:7214/api/empleados";
 
         // Función para cargar los empleados en la tabla al abrir la página
@@ -134,8 +134,6 @@ async function verNomina(id) {
 
         const nomina = await respuesta.json();
 
-        // IMPORTANTE: Aseguramos que las propiedades coincidan con el JSON de .NET
-        // .NET por defecto convierte las primeras letras a minúsculas en el JSON (camelCase)
         document.getElementById("nomEmpleado").innerText = (nomina.nombre || "Sin Nombre") + " (" + (nomina.numeroEmpleado || "S/N") + ")";
         document.getElementById("salQuincenal").innerText = nomina.salarioQuincenal;
         document.getElementById("dedImss").innerText = nomina.deduccionIMSS;

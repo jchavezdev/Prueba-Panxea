@@ -125,7 +125,7 @@ namespace WebPanxea.Controllers
     }
 
     // Estructura de apoyo para evitar problemas de nulos en la Consulta A
-    public class EmpleadoAuxiliar // <-- NOMBRE UNIFICADO AQUÍ
+    public class EmpleadoAuxiliar 
     {
         public string NumeroEmpleado { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;

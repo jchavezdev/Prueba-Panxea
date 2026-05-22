@@ -3,7 +3,7 @@ using WebPanxea;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- AGREGA ESTO PARA EVITAR BLOQUEOS DE SEGURIDAD (CORS) ---
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -29,9 +29,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// --- CORRE ESTO ANTES DE LOS CONTROLADORES ---
 app.UseCors();
-// ---------------------------------------------
 
 app.UseAuthorization();
 app.MapControllers();

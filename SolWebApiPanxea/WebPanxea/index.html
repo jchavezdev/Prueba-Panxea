@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Nómina - WebPanxea</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+            button:hover {
+                background-color: #004c99;
+            }
+
+        .detalle-box {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #0066cc;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Lista de Empleados Activos</h2>
+
+    <table id="tablaEmpleados">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Nombre</th>
+                <th>Departamento</th>
+                <th>Salario Mensual</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Los datos de la API se cargarán aquí -->
+        </tbody>
+    </table>
+
+    <!-- Sección para mostrar el desglose quincenal -->
+    <div id="seccionNomina" class="detalle-box">
+        <h3>Desglose de Nómina Quincenal</h3>
+        <p><strong>Empleado:</strong> <span id="nomEmpleado"></span></p>
+        <p><strong>Salario Quincenal:</strong> $<span id="salQuincenal"></span></p>
+        <p><strong>Deducción IMSS (3%):</strong> $<span id="dedImss"></span></p>
+        <p><strong>Deducción ISR:</strong> $<span id="dedIsr"></span></p>
+        <hr>
+        <p><strong>Salario Neto a Recibir:</strong> <span id="salNeto" style="font-weight:bold; color: green;"></span></p>
+    </div>
+
+    <script>
+        // Cambia el puerto (por ejemplo 5000 o 7200) por el que use tu API de .NET
+        const URL_API = "https://localhost:7214/api/empleados";
+
+        // Función para cargar los empleados en la tabla al abrir la página
+        async function cargarEmpleados() {
+            try {
+                const respuesta = await fetch(URL_API);
+                const empleados = await respuesta.json();
+
+                const tbody = document.querySelector("#tablaEmpleados tbody");
+                tbody.innerHTML = ""; // Limpiar tabla
+
+                for (let i = 0; i < empleados.length; i++) {
+                    let emp = empleados[i];
+
+                    // Creamos el renglón uno por uno de forma clásica
+                    let fila = `<tr>
+                        <td>${emp.numeroEmpleado}</td>
+                        <td>${emp.nombre}</td>
+                        <td>${emp.departamento}</td>
+                        <td>$${emp.salarioMensual.toLocaleString()}</td>
+                        <td>
+                            <button onclick="verNomina(${emp.id})">Ver Nómina</button>
+                        </td>
+                    </tr>`;
+
+                    tbody.innerHTML += fila;
+                }
+            } catch (error) {
+                alert("Error al conectar con la API. ¿Está el backend encendido?");
+                console.error(error);
+            }
+        }
+
+// Función para ir por la nómina de un empleado específico y mostrarla abajo
+async function verNomina(id) {
+    try {
+        // Usamos la URL base que ya te funcionó arriba
+        const respuesta = await fetch(`${URL_API}/${id}/nomina`);
+
+        if (!respuesta.ok) {
+            alert("El servidor respondió con un error al calcular la nómina.");
+            return;
+        }
+
+        const nomina = await respuesta.json();
+
+        // IMPORTANTE: Aseguramos que las propiedades coincidan con el JSON de .NET
+        // .NET por defecto convierte las primeras letras a minúsculas en el JSON (camelCase)
+        document.getElementById("nomEmpleado").innerText = (nomina.nombre || "Sin Nombre") + " (" + (nomina.numeroEmpleado || "S/N") + ")";
+        document.getElementById("salQuincenal").innerText = nomina.salarioQuincenal;
+        document.getElementById("dedImss").innerText = nomina.deduccionIMSS;
+        document.getElementById("dedIsr").innerText = nomina.deduccionISR;
+        document.getElementById("salNeto").innerText = "$" + nomina.salarioNeto;
+
+        // Hacer visible el cuadro azul de la nómina
+        document.getElementById("seccionNomina").style.display = "block";
+
+    } catch (error) {
+        console.error(error);
+        alert("Error de red o conexión al intentar obtener la nómina.");
+    }
+}
+
+        // Ejecutar la carga automática al abrir el archivo
+        window.onload = cargarEmpleados;
+    </script>
+</body>
+</html>

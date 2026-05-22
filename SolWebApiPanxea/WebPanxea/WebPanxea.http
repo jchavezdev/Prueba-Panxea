@@ -1,0 +1,6 @@
+@WebPanxea_HostAddress = http://localhost:5225
+
+GET {{WebPanxea_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
